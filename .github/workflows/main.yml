@@ -29,7 +29,7 @@ jobs:
         id: create_release
         uses: actions/create-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.SALARY1YR }}  # Use your custom token or `secrets.GITHUB_TOKEN` here
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Use your custom token or `secrets.GITHUB_TOKEN` here
         with:
           tag_name: v${{ env.VERSION }}
           release_name: Release v${{ env.VERSION }}
