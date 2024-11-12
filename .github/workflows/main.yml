@@ -12,11 +12,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set Version
+      - name: Find and Set Version
         id: set_version
         run: |
-          FILE_NAME="Salary_portable_v1.2.3.exe"
+          # Find the file in the 'releases' folder that matches the pattern "Salary_portable_v*.exe"
+          FILE_NAME=$(ls releases/Salary_portable_v*.exe | head -n 1)
+          
+          # Extract the version number using regex
           VERSION=$(echo $FILE_NAME | sed -E 's/.*_v([0-9]+\.[0-9]+\.[0-9]+)\.exe/\1/')
+          
+          # Expose the variables for later steps
+          echo "FILE_NAME=$FILE_NAME" >> $GITHUB_ENV
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
       - name: Create GitHub Release
@@ -35,6 +41,6 @@ jobs:
         uses: actions/upload-release-asset@v1
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./Salary_portable_v1.2.3.exe  # Update this path to match your file
-          asset_name: Salary_portable_v1.2.3.exe  # Name for the release asset
+          asset_path: ${{ env.FILE_NAME }}  # Use dynamically found file path
+          asset_name: $(basename ${{ env.FILE_NAME }})  # Only the file name
           asset_content_type: application/octet-stream
