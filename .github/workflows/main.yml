@@ -23,7 +23,7 @@ jobs:
         id: create_release
         uses: actions/create-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.SALARY1YR }}
+          token: ${{ secrets.SALARY1YR }}
         with:
           tag_name: v${{ env.VERSION }}  # Use extracted version here
           release_name: Release v${{ env.VERSION }}
