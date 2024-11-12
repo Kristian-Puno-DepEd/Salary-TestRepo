@@ -1,10 +1,11 @@
 name: Release EXE File
 
 on:
-  #push:
-  #  branches:
-  #    - main  # Set your main branch here
+  push:
+    branches:
+      - main  # Main branch trigger
   workflow_dispatch:
+
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -15,21 +16,21 @@ jobs:
       - name: Find and Set Version
         id: set_version
         run: |
-          # Find the file in the 'releases' folder that matches the pattern "Salary_portable_v*.exe"
           FILE_NAME=$(ls releases/Salary_portable_v*.exe | head -n 1)
-          
-          # Extract the version number using regex
           VERSION=$(echo $FILE_NAME | sed -E 's/.*_v([0-9]+\.[0-9]+\.[0-9]+)\.exe/\1/')
-          
-          # Expose the variables for later steps
           echo "FILE_NAME=$FILE_NAME" >> $GITHUB_ENV
           echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Debug File and Version
+        run: |
+          echo "File Name: ${{ env.FILE_NAME }}"
+          echo "Version: ${{ env.VERSION }}"
 
       - name: Create GitHub Release
         id: create_release
         uses: actions/create-release@v1
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Use your custom token or `secrets.GITHUB_TOKEN` here
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_GITHUB_TOKEN }}  # Ensure custom PAT here
         with:
           tag_name: v${{ env.VERSION }}
           release_name: Release v${{ env.VERSION }}
@@ -41,6 +42,6 @@ jobs:
         uses: actions/upload-release-asset@v1
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ env.FILE_NAME }}  # Use dynamically found file path
-          asset_name: $(basename ${{ env.FILE_NAME }})  # Only the file name
+          asset_path: ${{ env.FILE_NAME }}
+          asset_name: ${{ env.FILE_NAME##*/ }}
           asset_content_type: application/octet-stream
